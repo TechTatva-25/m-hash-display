@@ -5,7 +5,6 @@
  * 
  * This script regenerates all audio files using Windows PowerShell TTS.
  * Run this if you need to update audio files or if they're missing.
- * 
  * Usage: node regenerate-audio.js
  */
 

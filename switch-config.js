@@ -24,33 +24,41 @@ if (!mode || !['test', 'prod'].includes(mode)) {
 }
 
 try {
-    // Backup current config
-    if (fs.existsSync('hackathon-config.json')) {
-        fs.copyFileSync('hackathon-config.json', 'hackathon-config-backup.json');
-        console.log('📋 Backed up current configuration');
-    }
-
     if (mode === 'test') {
-        // Switch to test config
-        fs.copyFileSync('hackathon-config-test.json', 'hackathon-config.json');
-        console.log('🧪 Switched to TEST mode');
-        console.log('   - All events start at 12:10 PM today');
-        console.log('   - Each event lasts 1 minute');
-        console.log('   - Perfect for demo and testing');
-        console.log('');
-        console.log('🚀 Run "npm start" to see the test display');
-        console.log('⏰ Events will transition every minute starting at 12:10 PM');
+        // Switch to test config (never overwrites production backup)
+        if (fs.existsSync('hackathon-config-test.json')) {
+            fs.copyFileSync('hackathon-config-test.json', 'hackathon-config.json');
+            console.log('🧪 Switched to TEST mode');
+            console.log('   - All events start at 12:10 PM today');
+            console.log('   - Each event lasts 1 minute');
+            console.log('   - Perfect for demo and testing');
+            console.log('');
+            console.log('🚀 Run "npm start" to see the test display');
+            console.log('⏰ Events will transition every minute starting at 12:10 PM');
+            console.log('⚠️  Production config is safely preserved in backup');
+        } else {
+            console.log('❌ Test configuration file not found: hackathon-config-test.json');
+        }
     } else if (mode === 'prod') {
         // Switch to production config
         if (fs.existsSync('hackathon-config-backup.json')) {
             fs.copyFileSync('hackathon-config-backup.json', 'hackathon-config.json');
             console.log('🎪 Switched to PRODUCTION mode');
             console.log('   - Real hackathon timeline (Oct 8-10, 2025)');
-            console.log('   - Actual event durations');
+            console.log('   - Official Manipal Hackathon 2025 schedule');
+            console.log('   - Actual event durations and timings');
             console.log('');
             console.log('🚀 Run "npm start" to see the production display');
+            console.log('📅 Hackathon runs Oct 8-10, 2025');
         } else {
-            console.log('❌ No backup configuration found. Please restore manually.');
+            console.log('❌ Production backup not found. Creating from current config...');
+            // Create backup from current config if it doesn't exist
+            if (fs.existsSync('hackathon-config.json')) {
+                fs.copyFileSync('hackathon-config.json', 'hackathon-config-backup.json');
+                console.log('📋 Created production backup from current config');
+            } else {
+                console.log('❌ No configuration files found. Please check your setup.');
+            }
         }
     }
 

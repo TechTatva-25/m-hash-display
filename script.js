@@ -122,12 +122,21 @@ class HackathonStatusDisplay {
             
             // Add pulse animation for live rounds
             document.getElementById('currentRound').classList.add('pulse');
-        } else {
+        } else if (this.nextRound) {
+            // Hackathon not started yet
             roundNameEl.textContent = 'Hackathon Not Started';
             roundStatusEl.textContent = 'Upcoming';
             startTimeEl.textContent = '--:--';
             endTimeEl.textContent = '--:--';
             statusIndicatorEl.className = 'status-indicator status-upcoming';
+            document.getElementById('currentRound').classList.remove('pulse');
+        } else {
+            // Hackathon has ended
+            roundNameEl.textContent = 'Thank You for Participating!';
+            roundStatusEl.textContent = 'Hackathon Concluded';
+            startTimeEl.textContent = '--:--';
+            endTimeEl.textContent = '--:--';
+            statusIndicatorEl.className = 'status-indicator status-ended';
             document.getElementById('currentRound').classList.remove('pulse');
         }
     }
