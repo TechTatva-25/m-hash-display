@@ -1,0 +1,30 @@
+{
+  "name": "mhash-display",
+  "version": "1.0.0",
+  "description": "Real-time status display for Manipal Hackathon 2025",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx live-server --port=3000 --no-browser",
+    "http-server": "npx http-server -p 3000 -c-1",
+    "regenerate-audio": "node regenerate-audio.js",
+    "build": "echo 'No build process needed for static files'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "hackathon",
+    "status-display",
+    "real-time",
+    "manipal",
+    "countdown"
+  ],
+  "author": "Manipal Hackathon 2025 Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

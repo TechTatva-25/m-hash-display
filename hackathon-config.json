@@ -1,0 +1,299 @@
+{
+  "hackathon": {
+    "name": "Manipal Hackathon 2025",
+    "theme": "Code for Coexistence",
+    "institute": "Manipal Institute of Technology",
+    "dates": {
+      "start": "2025-10-08",
+      "end": "2025-10-10"
+    }
+  },
+  "rounds": [
+    {
+      "id": "registration",
+      "name": "Registration and Welcome Address",
+      "startTime": "2025-10-08T07:00:00",
+      "endTime": "2025-10-08T09:00:00",
+      "type": "setup",
+      "codingHours": 0,
+      "description": "Registration and Welcome Address"
+    },
+    {
+      "id": "rules",
+      "name": "Overview of Hackathon Rules and Guidelines",
+      "startTime": "2025-10-08T09:00:00",
+      "endTime": "2025-10-08T09:30:00",
+      "type": "setup",
+      "codingHours": 0,
+      "description": "Overview of Hackathon Rules and Guidelines"
+    },
+    {
+      "id": "inauguration",
+      "name": "Inauguration Ceremony",
+      "startTime": "2025-10-08T09:30:00",
+      "endTime": "2025-10-08T10:00:00",
+      "type": "ceremony",
+      "codingHours": 0,
+      "description": "Inauguration Ceremony"
+    },
+    {
+      "id": "coding-slot-0",
+      "name": "Coding Slot 0",
+      "startTime": "2025-10-08T10:00:00",
+      "endTime": "2025-10-08T13:30:00",
+      "type": "coding",
+      "codingHours": 3.5,
+      "description": "First coding session"
+    },
+    {
+      "id": "lunch-1",
+      "name": "Lunch",
+      "startTime": "2025-10-08T13:30:00",
+      "endTime": "2025-10-08T14:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Lunch Break"
+    },
+    {
+      "id": "coding-slot-1",
+      "name": "Coding Slot 1 / Mentoring Round",
+      "startTime": "2025-10-08T14:30:00",
+      "endTime": "2025-10-08T18:00:00",
+      "type": "coding",
+      "codingHours": 3.5,
+      "description": "Coding with mentoring support"
+    },
+    {
+      "id": "snack-1",
+      "name": "Snack Break",
+      "startTime": "2025-10-08T18:00:00",
+      "endTime": "2025-10-08T18:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Snack Break"
+    },
+    {
+      "id": "coding-slot-2",
+      "name": "Coding Slot 2",
+      "startTime": "2025-10-08T18:30:00",
+      "endTime": "2025-10-08T20:30:00",
+      "type": "coding",
+      "codingHours": 2,
+      "description": "Evening coding session"
+    },
+    {
+      "id": "dinner-1",
+      "name": "Dinner",
+      "startTime": "2025-10-08T20:30:00",
+      "endTime": "2025-10-08T21:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Dinner Break"
+    },
+    {
+      "id": "coding-slot-3",
+      "name": "Coding Slot 3",
+      "startTime": "2025-10-08T21:30:00",
+      "endTime": "2025-10-09T07:00:00",
+      "type": "coding",
+      "codingHours": 9.5,
+      "description": "Overnight coding marathon"
+    },
+    {
+      "id": "breakfast-1",
+      "name": "Breakfast",
+      "startTime": "2025-10-09T07:00:00",
+      "endTime": "2025-10-09T08:00:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Breakfast"
+    },
+    {
+      "id": "judging-1",
+      "name": "Judging Round 1",
+      "startTime": "2025-10-09T08:00:00",
+      "endTime": "2025-10-09T10:00:00",
+      "type": "judging",
+      "codingHours": 0,
+      "description": "First round of judging"
+    },
+    {
+      "id": "coding-slot-4",
+      "name": "Coding Slot 4",
+      "startTime": "2025-10-09T10:00:00",
+      "endTime": "2025-10-09T13:30:00",
+      "type": "coding",
+      "codingHours": 3.5,
+      "description": "Post-judging coding session"
+    },
+    {
+      "id": "lunch-2",
+      "name": "Lunch",
+      "startTime": "2025-10-09T13:30:00",
+      "endTime": "2025-10-09T14:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Lunch Break"
+    },
+    {
+      "id": "coding-slot-5",
+      "name": "Coding Slot 5",
+      "startTime": "2025-10-09T14:30:00",
+      "endTime": "2025-10-09T18:00:00",
+      "type": "coding",
+      "codingHours": 3.5,
+      "description": "Afternoon coding session"
+    },
+    {
+      "id": "snack-2",
+      "name": "Snack Break",
+      "startTime": "2025-10-09T18:00:00",
+      "endTime": "2025-10-09T18:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Snack Break"
+    },
+    {
+      "id": "judging-2",
+      "name": "Judging Round 2",
+      "startTime": "2025-10-09T18:30:00",
+      "endTime": "2025-10-09T20:00:00",
+      "type": "judging",
+      "codingHours": 0,
+      "description": "Second round of judging"
+    },
+    {
+      "id": "dinner-2",
+      "name": "Dinner",
+      "startTime": "2025-10-09T20:00:00",
+      "endTime": "2025-10-09T21:00:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Dinner Break"
+    },
+    {
+      "id": "coding-slot-6",
+      "name": "Coding Slot 6",
+      "startTime": "2025-10-09T21:00:00",
+      "endTime": "2025-10-09T23:30:00",
+      "type": "coding",
+      "codingHours": 2.5,
+      "description": "Evening coding session"
+    },
+    {
+      "id": "bug-bounty",
+      "name": "Bug Bounty Round",
+      "startTime": "2025-10-09T23:30:00",
+      "endTime": "2025-10-10T01:30:00",
+      "type": "special",
+      "codingHours": 2,
+      "description": "Bug hunting and fixing competition"
+    },
+    {
+      "id": "coding-slot-7",
+      "name": "Coding Slot 7 (Bug Fixing Round)",
+      "startTime": "2025-10-10T01:30:00",
+      "endTime": "2025-10-10T07:30:00",
+      "type": "coding",
+      "codingHours": 6,
+      "description": "Final coding session with bug fixes"
+    },
+    {
+      "id": "breakfast-2",
+      "name": "Breakfast",
+      "startTime": "2025-10-10T07:30:00",
+      "endTime": "2025-10-10T08:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Final Breakfast"
+    },
+    {
+      "id": "judging-3",
+      "name": "Judge Round 3 & Bug Bounty Evaluation",
+      "startTime": "2025-10-10T08:30:00",
+      "endTime": "2025-10-10T10:30:00",
+      "type": "judging",
+      "codingHours": 0,
+      "description": "Final judging and bug bounty evaluation"
+    },
+    {
+      "id": "judge-deliberation",
+      "name": "Judges Discussion & Evaluation for Shortlisting Top Teams",
+      "startTime": "2025-10-10T10:30:00",
+      "endTime": "2025-10-10T11:00:00",
+      "type": "judging",
+      "codingHours": 0,
+      "description": "Judges deliberation for top teams"
+    },
+    {
+      "id": "final-presentation",
+      "name": "Final Presentation (Top Teams)",
+      "startTime": "2025-10-10T11:00:00",
+      "endTime": "2025-10-10T13:30:00",
+      "type": "presentation",
+      "codingHours": 0,
+      "description": "Final presentations by top teams"
+    },
+    {
+      "id": "lunch-3",
+      "name": "Lunch",
+      "startTime": "2025-10-10T13:30:00",
+      "endTime": "2025-10-10T14:30:00",
+      "type": "break",
+      "codingHours": 0,
+      "description": "Final Lunch"
+    },
+    {
+      "id": "judge-deliberation-final",
+      "name": "Judge Deliberation",
+      "startTime": "2025-10-10T14:30:00",
+      "endTime": "2025-10-10T15:00:00",
+      "type": "judging",
+      "codingHours": 0,
+      "description": "Final judge deliberation"
+    },
+    {
+      "id": "valedictory",
+      "name": "Valedictory Ceremony",
+      "startTime": "2025-10-10T15:00:00",
+      "endTime": "2025-10-10T17:00:00",
+      "type": "ceremony",
+      "codingHours": 0,
+      "description": "Awards and closing ceremony"
+    }
+  ],
+  "audio": {
+    "roundStart": "round-start.wav",
+    "roundEnd": "round-end.wav",
+    "rounds": {
+      "registration": "registration.wav",
+      "rules": "rules.wav",
+      "inauguration": "inauguration.wav",
+      "coding-slot-0": "coding-slot-0.wav",
+      "lunch-1": "lunch-1.wav",
+      "coding-slot-1": "coding-slot-1.wav",
+      "snack-1": "snack-1.wav",
+      "coding-slot-2": "coding-slot-2.wav",
+      "dinner-1": "dinner-1.wav",
+      "coding-slot-3": "coding-slot-3.wav",
+      "breakfast-1": "breakfast-1.wav",
+      "judging-1": "judging-1.wav",
+      "coding-slot-4": "coding-slot-4.wav",
+      "lunch-2": "lunch-2.wav",
+      "coding-slot-5": "coding-slot-5.wav",
+      "snack-2": "snack-2.wav",
+      "judging-2": "judging-2.wav",
+      "dinner-2": "dinner-2.wav",
+      "coding-slot-6": "coding-slot-6.wav",
+      "bug-bounty": "bug-bounty.wav",
+      "coding-slot-7": "coding-slot-7.wav",
+      "breakfast-2": "breakfast-2.wav",
+      "judging-3": "judging-3.wav",
+      "judge-deliberation": "judge-deliberation.wav",
+      "final-presentation": "final-presentation.wav",
+      "lunch-3": "lunch-3.wav",
+      "judge-deliberation-final": "judge-deliberation-final.wav",
+      "valedictory": "valedictory.wav"
+    }
+  }
+}
