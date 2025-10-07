@@ -8,6 +8,10 @@ class HackathonStatusDisplay {
         this.isAudioEnabled = true;
         this.isPlayingAudio = false;
         this.lastAnnouncedRound = null;
+        this.audioUnlocked = false; // Track if user has interacted with the page
+        this.hasTriggeredStartAudio = {}; // Track which rounds have triggered start audio
+        this.hasTriggeredEndAudio = {}; // Track which rounds have triggered end audio
+        this.audioQueue = []; // Queue for audio playback
         
         this.init();
     }
@@ -213,97 +217,210 @@ class HackathonStatusDisplay {
             const startTime = new Date(round.startTime);
             const endTime = new Date(round.endTime);
             
-            // Check if a round just started (within last 5 seconds)
-            if (now >= startTime && now <= new Date(startTime.getTime() + 5000)) {
-                this.playRoundStartAudio(round);
+            // Check if a round is about to start (10 seconds before start)
+            if (now >= new Date(startTime.getTime() - 10000) && now <= new Date(startTime.getTime() + 5000)) {
+                // Only trigger once per round
+                if (!this.hasTriggeredStartAudio[round.id]) {
+                    this.hasTriggeredStartAudio[round.id] = true;
+                    this.queueRoundStartAudio(round, 1000); // 1 second delay
+                }
             }
             
-            // Check if a round just ended (within last 5 seconds)
-            if (now >= endTime && now <= new Date(endTime.getTime() + 5000)) {
-                this.playRoundEndAudio(round);
+            // Check if a round is about to end (10 seconds before end)
+            if (now >= new Date(endTime.getTime() - 10000) && now <= new Date(endTime.getTime() + 5000)) {
+                // Only trigger once per round
+                if (!this.hasTriggeredEndAudio[round.id]) {
+                    this.hasTriggeredEndAudio[round.id] = true;
+                    this.playRoundEndAudio(round);
+                }
             }
         }
     }
 
     setupAudio() {
+        // Initialize audio system
+        this.isAudioEnabled = true;
+        this.audioUnlocked = false; // Track if user has interacted
+        console.log('Audio system initialized (requires user interaction)');
+        
         // Initialize Web Audio API
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('Web Audio API available:', this.audioContext.state);
         } catch (error) {
-            console.warn('Web Audio API not supported, audio disabled');
-            this.isAudioEnabled = false;
+            console.log('Web Audio API not available');
+        }
+        
+        // Add user interaction handlers to unlock audio
+        const unlockAudio = () => {
+            if (!this.audioUnlocked) {
+                console.log('🔓 Unlocking audio with user interaction...');
+                this.audioUnlocked = true;
+                
+                // Update UI
+                this.updateAudioStatus();
+                
+                // Resume audio context if suspended
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        console.log('✅ Audio context resumed');
+                    });
+                }
+                
+                // Test audio playback
+                this.testAudioPlayback();
+            }
+        };
+        
+        // Unlock audio on first user interaction
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('keydown', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+    }
+    
+    async testAudioPlayback() {
+        console.log('🧪 Testing audio playback...');
+        try {
+            const audio = new Audio('audio/round-start.wav');
+            audio.volume = 0.1; // Very quiet test
+            await audio.play();
+            console.log('✅ Audio playback test successful');
+            audio.pause();
+        } catch (error) {
+            console.log('❌ Audio playback test failed:', error.message);
+        }
+    }
+    
+    updateAudioStatus() {
+        const indicator = document.getElementById('audioIndicator');
+        const text = document.getElementById('audioText');
+        const status = document.getElementById('audioStatus');
+        
+        if (this.audioUnlocked) {
+            indicator.textContent = '🔊';
+            text.textContent = 'Audio enabled';
+            status.classList.add('unlocked');
+        } else {
+            indicator.textContent = '🔇';
+            text.textContent = 'Click anywhere to enable audio';
+            status.classList.remove('unlocked');
         }
     }
 
     async playRoundStartAudio(round) {
-        if (!this.isAudioEnabled || this.isPlayingAudio) return;
+        console.log('🎵 Attempting to play round start audio for:', round.name);
+        console.log('Audio enabled:', this.isAudioEnabled, 'Audio unlocked:', this.audioUnlocked, 'Playing audio:', this.isPlayingAudio);
+        
+        if (!this.isAudioEnabled) {
+            console.log('❌ Audio disabled');
+            return;
+        }
+        
+        if (!this.audioUnlocked) {
+            console.log('❌ Audio not unlocked yet, using text-to-speech fallback');
+            this.speakText(`${round.name} is starting now!`);
+            return;
+        }
         
         // Prevent duplicate announcements
-        if (this.lastAnnouncedRound === round.id) return;
-        
-        this.isPlayingAudio = true;
-        this.lastAnnouncedRound = round.id;
-        
-        try {
-            // Play specific round audio first, then wait for it to finish
-            const roundAudioFile = this.config.audio?.rounds?.[round.id];
-            if (roundAudioFile) {
-                await this.playAudioFile(`audio/${roundAudioFile}`);
-                // Wait a bit between audio files
-                await this.delay(400);
-            }
-            
-            // Then play generic start audio
-            await this.playAudioFile(`audio/${this.config.audio?.roundStart}`);
-        } catch (error) {
-            console.warn('Could not play round start audio:', error);
-            // Fallback to text-to-speech
-            this.speakText(`${round.name} is starting now!`);
-        } finally {
-            this.isPlayingAudio = false;
+        if (this.lastAnnouncedRound === round.id) {
+            console.log('❌ Duplicate announcement prevented');
+            return;
         }
+        
+        // Add to queue instead of playing immediately
+        this.audioQueue.push({
+            type: 'start',
+            round: round,
+            timestamp: Date.now()
+        });
+        
+        this.processAudioQueue();
     }
 
     async playRoundEndAudio(round) {
-        if (!this.isAudioEnabled || this.isPlayingAudio) return;
+        console.log('🎵 Attempting to play round end audio for:', round.name);
+        console.log('Audio enabled:', this.isAudioEnabled, 'Audio unlocked:', this.audioUnlocked, 'Playing audio:', this.isPlayingAudio);
         
-        this.isPlayingAudio = true;
-        
-        try {
-            // Play generic end audio
-            await this.playAudioFile(`audio/${this.config.audio?.roundEnd}`);
-        } catch (error) {
-            console.warn('Could not play round end audio:', error);
-            // Fallback to text-to-speech
-            this.speakText(`${round.name} is over!`);
-        } finally {
-            this.isPlayingAudio = false;
+        if (!this.isAudioEnabled) {
+            console.log('❌ Audio disabled');
+            return;
         }
+        
+        if (!this.audioUnlocked) {
+            console.log('❌ Audio not unlocked yet, using text-to-speech fallback');
+            this.speakText(`${round.name} is over!`);
+            return;
+        }
+        
+        // Add to queue instead of playing immediately
+        this.audioQueue.push({
+            type: 'end',
+            round: round,
+            timestamp: Date.now()
+        });
+        
+        this.processAudioQueue();
     }
 
     async playAudioFile(filename) {
-        if (!this.audioContext) return;
+        console.log('🎵 Attempting to play audio file:', filename);
         
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await fetch(filename);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-                
-                const source = this.audioContext.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(this.audioContext.destination);
-                
-                // Wait for audio to finish playing
-                source.onended = () => {
-                    resolve();
-                };
-                
-                source.start();
-            } catch (error) {
-                console.warn(`Could not play audio file ${filename}:`, error);
-                reject(error);
-            }
+        // Use HTML5 Audio as primary method (works without user interaction)
+        return this.playAudioFileFallback(filename);
+    }
+
+    // Play audio file and return its duration
+    async playAudioFileWithDuration(filename) {
+        console.log('🎵 Playing audio file with duration tracking:', filename);
+        
+        return new Promise((resolve, reject) => {
+            const audio = new Audio(filename);
+            audio.volume = 0.8;
+            audio.preload = 'auto';
+            
+            let resolved = false;
+            const resolveOnce = (duration) => {
+                if (!resolved) {
+                    resolved = true;
+                    console.log('🔄 Audio promise resolved for:', filename, 'duration:', duration);
+                    resolve(duration || 0);
+                }
+            };
+            
+            audio.onloadedmetadata = () => {
+                console.log('📦 Audio metadata loaded:', filename, 'duration:', audio.duration);
+            };
+            
+            audio.oncanplaythrough = () => {
+                console.log('▶️ Starting audio playback:', filename);
+                audio.play().then(() => {
+                    console.log('✅ Audio started successfully');
+                }).catch(error => {
+                    console.log('❌ Audio play failed:', error);
+                    resolveOnce(0);
+                });
+            };
+            
+            audio.onended = () => {
+                console.log('✅ Audio playback completed:', filename);
+                resolveOnce(audio.duration || 0);
+            };
+            
+            audio.onerror = (error) => {
+                console.log('❌ Audio error:', error);
+                resolveOnce(0);
+            };
+            
+            // Timeout fallback
+            setTimeout(() => {
+                if (!resolved) {
+                    console.log('⏰ Audio timeout, resolving with estimated duration');
+                    resolveOnce(2000); // Default 2 second estimate
+                }
+            }, 5000);
+            
+            audio.load();
         });
     }
 
@@ -315,6 +432,70 @@ class HackathonStatusDisplay {
             utterance.volume = 0.8;
             speechSynthesis.speak(utterance);
         }
+    }
+
+    // Primary audio method using HTML5 Audio (no user interaction required)
+    playAudioFileFallback(filename) {
+        return new Promise((resolve, reject) => {
+            console.log('🎵 Using HTML5 Audio for:', filename);
+            const audio = new Audio(filename);
+            
+            // Set audio properties
+            audio.volume = 0.8;
+            audio.preload = 'auto';
+            
+            // Track if audio has been resolved to prevent multiple resolutions
+            let resolved = false;
+            
+            const resolveOnce = () => {
+                if (!resolved) {
+                    resolved = true;
+                    console.log('🔄 Audio promise resolved for:', filename);
+                    resolve();
+                }
+            };
+            
+            audio.onloadeddata = () => {
+                console.log('📦 Audio file loaded:', filename);
+            };
+            
+            audio.oncanplaythrough = () => {
+                console.log('▶️ Starting HTML5 audio playback:', filename);
+                audio.play().then(() => {
+                    console.log('✅ HTML5 audio started successfully');
+                }).catch(error => {
+                    console.log('❌ HTML5 audio play failed:', error);
+                    // Try to use text-to-speech as final fallback
+                    console.log('🔄 Falling back to text-to-speech...');
+                    this.speakText('Audio playback failed, using text to speech');
+                    resolveOnce(); // Don't reject, just resolve to continue
+                });
+            };
+            
+            audio.onended = () => {
+                console.log('✅ HTML5 audio playback completed:', filename);
+                resolveOnce();
+            };
+            
+            audio.onerror = (error) => {
+                console.log('❌ HTML5 audio error:', error);
+                // Try to use text-to-speech as final fallback
+                console.log('🔄 Falling back to text-to-speech...');
+                this.speakText('Audio file not found, using text to speech');
+                resolveOnce(); // Don't reject, just resolve to continue
+            };
+            
+            // Set a shorter timeout to prevent hanging
+            setTimeout(() => {
+                if (!resolved) {
+                    console.log('⏰ Audio timeout, resolving...');
+                    resolveOnce();
+                }
+            }, 3000); // 3 second timeout
+            
+            // Load the audio file
+            audio.load();
+        });
     }
 
     formatTime(date) {
@@ -343,11 +524,106 @@ class HackathonStatusDisplay {
             this.playRoundEndAudio(round);
         }
     }
+    
+    // Method to reset audio state (for debugging)
+    resetAudioState() {
+        console.log('🔄 Resetting audio state...');
+        this.isPlayingAudio = false;
+        this.lastAnnouncedRound = null;
+        this.hasTriggeredStartAudio = {};
+        this.hasTriggeredEndAudio = {};
+        this.audioQueue = [];
+        console.log('✅ Audio state reset');
+    }
+    
+    // Method to force unlock audio (for debugging)
+    forceUnlockAudio() {
+        console.log('🔓 Force unlocking audio...');
+        this.audioUnlocked = true;
+        this.updateAudioStatus();
+        console.log('✅ Audio force unlocked');
+    }
+    
+    // Method to queue round start audio after a delay
+    async queueRoundStartAudio(round, delayMs = 2000) {
+        console.log(`⏰ Queuing round start audio for ${round.name} in ${delayMs}ms`);
+        setTimeout(async () => {
+            console.log(`⏰ Executing queued round start audio for ${round.name}`);
+            await this.playRoundStartAudio(round);
+        }, delayMs);
+    }
+
+    // Process audio queue with proper sequencing
+    async processAudioQueue() {
+        if (this.isPlayingAudio || this.audioQueue.length === 0) {
+            return;
+        }
+
+        this.isPlayingAudio = true;
+        
+        while (this.audioQueue.length > 0) {
+            const audioItem = this.audioQueue.shift();
+            console.log(`🎵 Processing audio queue item: ${audioItem.type} for ${audioItem.round.name}`);
+            
+            try {
+                if (audioItem.type === 'end') {
+                    await this.playEndAudioSequence(audioItem.round);
+                } else if (audioItem.type === 'start') {
+                    await this.playStartAudioSequence(audioItem.round);
+                }
+            } catch (error) {
+                console.warn('❌ Error processing audio queue item:', error);
+            }
+        }
+        
+        this.isPlayingAudio = false;
+        console.log('🔄 Audio queue processing completed');
+    }
+
+    // Play end audio sequence
+    async playEndAudioSequence(round) {
+        console.log('🔊 Playing end audio sequence for:', round.name);
+        
+        // Play generic end audio
+        console.log('🔊 Playing generic end audio:', this.config.audio?.roundEnd);
+        const endDuration = await this.playAudioFileWithDuration(`audio/${this.config.audio?.roundEnd}`);
+        console.log('✅ Round end audio completed, duration:', endDuration);
+        
+        // Add extra delay after end audio
+        console.log('⏳ Waiting 2 seconds after end audio...');
+        await this.delay(2000);
+    }
+
+    // Play start audio sequence
+    async playStartAudioSequence(round) {
+        console.log('🔊 Playing start audio sequence for:', round.name);
+        
+        // Play specific round audio first
+        const roundAudioFile = this.config.audio?.rounds?.[round.id];
+        if (roundAudioFile) {
+            console.log('🔊 Playing round-specific audio:', roundAudioFile);
+            const roundDuration = await this.playAudioFileWithDuration(`audio/${roundAudioFile}`);
+            console.log('✅ Round-specific audio completed, duration:', roundDuration);
+            
+            // Dynamic delay based on audio length (minimum 500ms, maximum 2 seconds)
+            const dynamicDelay = Math.min(Math.max(roundDuration * 0.2, 500), 2000);
+            console.log(`⏳ Waiting ${dynamicDelay}ms between audio files...`);
+            await this.delay(dynamicDelay);
+        }
+        
+        // Then play generic start audio
+        console.log('🔊 Playing generic start audio:', this.config.audio?.roundStart);
+        const startDuration = await this.playAudioFileWithDuration(`audio/${this.config.audio?.roundStart}`);
+        console.log('✅ Round start audio completed, duration:', startDuration);
+    }
 }
 
 // Initialize the display when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     window.hackathonDisplay = new HackathonStatusDisplay();
+    
+    // Initialize audio status display
+    window.hackathonDisplay.updateAudioStatus();
     
     // Add keyboard shortcuts for testing
     document.addEventListener('keydown', (e) => {
@@ -371,10 +647,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        if (e.ctrlKey && e.key === 'r') {
+            e.preventDefault();
+            // Reset audio state
+            if (window.hackathonDisplay) {
+                window.hackathonDisplay.resetAudioState();
+            }
+        }
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            // Force unlock audio
+            if (window.hackathonDisplay) {
+                window.hackathonDisplay.forceUnlockAudio();
+            }
+        }
     });
     
     console.log('Hackathon Status Display initialized');
-    console.log('Press Ctrl+S to test round start audio, Ctrl+E to test round end audio');
+    console.log('Press Ctrl+S to test round start audio, Ctrl+E to test round end audio, Ctrl+R to reset audio state, Ctrl+U to force unlock audio');
 });
 
 // Handle page visibility changes to pause/resume audio
@@ -391,3 +681,4 @@ document.addEventListener('visibilitychange', () => {
         }
     }
 });
+

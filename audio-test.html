@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test - Manipal Hackathon 2025</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d4f3c;
+            color: #e8f5e8;
+        }
+        .test-section {
+            background: rgba(232, 245, 232, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(168, 216, 168, 0.3);
+        }
+        button {
+            background: #1a6b5a;
+            color: #e8f5e8;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2a7b6a;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Audio Test - Manipal Hackathon 2025</h1>
+    
+    <div class="test-section">
+        <h2>HTML5 Audio Test (Primary Method)</h2>
+        <button onclick="testHTML5Audio()">Test HTML5 Audio</button>
+        <button onclick="testRoundStart()">Test Round Start Audio</button>
+        <button onclick="testRoundEnd()">Test Round End Audio</button>
+        <button onclick="testAutoPlay()">Test Auto Play (No Click)</button>
+        <div id="html5Status">Not tested</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Web Audio API Test (Fallback)</h2>
+        <button onclick="testWebAudio()">Test Web Audio API</button>
+        <button onclick="testAudioContext()">Check Audio Context</button>
+        <div id="webAudioStatus">Not tested</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Text-to-Speech Test</h2>
+        <button onclick="testTTS()">Test Text-to-Speech</button>
+        <div id="ttsStatus">Not tested</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Log</h2>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        let audioContext;
+        let logElement = document.getElementById('log');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logElement.innerHTML = '';
+        }
+        
+        function testAudioContext() {
+            log('🔍 Testing Audio Context...');
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                log(`✅ Audio Context created: ${audioContext.state}`);
+                log(`📊 Sample Rate: ${audioContext.sampleRate}Hz`);
+                log(`⏱️ Current Time: ${audioContext.currentTime}s`);
+            } catch (error) {
+                log(`❌ Audio Context failed: ${error.message}`);
+            }
+        }
+        
+        async function testWebAudio() {
+            log('🎵 Testing Web Audio API...');
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                if (audioContext.state === 'suspended') {
+                    log('⚠️ Audio context suspended, resuming...');
+                    await audioContext.resume();
+                    log(`✅ Audio context resumed: ${audioContext.state}`);
+                }
+                
+                const response = await fetch('audio/round-start.wav');
+                log(`📡 Fetch response: ${response.status} ${response.statusText}`);
+                
+                const arrayBuffer = await response.arrayBuffer();
+                log(`📦 Array buffer size: ${arrayBuffer.byteLength} bytes`);
+                
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                log(`🔊 Audio buffer decoded: ${audioBuffer.duration}s duration`);
+                
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioContext.destination);
+                
+                source.onended = () => {
+                    log('✅ Web Audio playback completed');
+                };
+                
+                source.start();
+                log('▶️ Web Audio playback started');
+                
+            } catch (error) {
+                log(`❌ Web Audio test failed: ${error.message}`);
+            }
+        }
+        
+        function testHTML5Audio() {
+            log('🎵 Testing HTML5 Audio...');
+            try {
+                const audio = new Audio('audio/round-start.wav');
+                
+                audio.onloadeddata = () => {
+                    log('📦 HTML5 Audio loaded');
+                };
+                
+                audio.oncanplaythrough = () => {
+                    log('▶️ HTML5 Audio can play through');
+                };
+                
+                audio.onplay = () => {
+                    log('▶️ HTML5 Audio started playing');
+                };
+                
+                audio.onended = () => {
+                    log('✅ HTML5 Audio playback completed');
+                };
+                
+                audio.onerror = (error) => {
+                    log(`❌ HTML5 Audio error: ${error.message || 'Unknown error'}`);
+                };
+                
+                audio.play().then(() => {
+                    log('✅ HTML5 Audio play() succeeded');
+                }).catch(error => {
+                    log(`❌ HTML5 Audio play() failed: ${error.message}`);
+                });
+                
+            } catch (error) {
+                log(`❌ HTML5 Audio test failed: ${error.message}`);
+            }
+        }
+        
+        function testRoundStart() {
+            log('🎵 Testing Round Start Audio...');
+            const audio = new Audio('audio/round-start.wav');
+            audio.play().then(() => {
+                log('✅ Round Start Audio playing');
+            }).catch(error => {
+                log(`❌ Round Start Audio failed: ${error.message}`);
+            });
+        }
+        
+        function testRoundEnd() {
+            log('🎵 Testing Round End Audio...');
+            const audio = new Audio('audio/round-end.wav');
+            audio.play().then(() => {
+                log('✅ Round End Audio playing');
+            }).catch(error => {
+                log(`❌ Round End Audio failed: ${error.message}`);
+            });
+        }
+        
+        function testAutoPlay() {
+            log('🎵 Testing Auto Play (simulating round transition)...');
+            const audio = new Audio('audio/round-start.wav');
+            audio.volume = 0.8;
+            
+            audio.onloadeddata = () => {
+                log('📦 Auto play audio loaded');
+            };
+            
+            audio.oncanplaythrough = () => {
+                log('▶️ Auto play starting...');
+                audio.play().then(() => {
+                    log('✅ Auto play succeeded (no user interaction required)');
+                }).catch(error => {
+                    log(`❌ Auto play failed: ${error.message}`);
+                });
+            };
+            
+            audio.onended = () => {
+                log('✅ Auto play completed');
+            };
+            
+            audio.onerror = (error) => {
+                log(`❌ Auto play error: ${error.message || 'Unknown error'}`);
+            };
+            
+            audio.load();
+        }
+        
+        function testTTS() {
+            log('🎵 Testing Text-to-Speech...');
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance('Testing text to speech for Manipal Hackathon 2025');
+                utterance.rate = 0.8;
+                utterance.pitch = 1.2;
+                utterance.volume = 0.8;
+                
+                utterance.onstart = () => {
+                    log('▶️ TTS started');
+                };
+                
+                utterance.onend = () => {
+                    log('✅ TTS completed');
+                };
+                
+                utterance.onerror = (error) => {
+                    log(`❌ TTS error: ${error.error}`);
+                };
+                
+                speechSynthesis.speak(utterance);
+                log('🎤 TTS initiated');
+            } else {
+                log('❌ Speech Synthesis not supported');
+            }
+        }
+        
+        // Initialize
+        log('🚀 Audio Test Page Loaded');
+        log('💡 Click buttons to test different audio methods');
+        
+        // Auto-test after 2 seconds to simulate automatic audio
+        setTimeout(() => {
+            log('🔄 Running automatic audio test in 2 seconds...');
+            setTimeout(() => {
+                testAutoPlay();
+            }, 2000);
+        }, 2000);
+    </script>
+</body>
+</html>

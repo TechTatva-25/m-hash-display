@@ -12,8 +12,8 @@
     {
       "id": "registration",
       "name": "Registration and Welcome Address",
-      "startTime": "2025-10-07T11:15:00",
-      "endTime": "2025-10-07T11:16:00",
+      "startTime": "2025-10-07T12:10:00",
+      "endTime": "2025-10-07T12:11:00",
       "type": "setup",
       "codingHours": 0,
       "description": "Registration and Welcome Address"
@@ -21,8 +21,8 @@
     {
       "id": "rules",
       "name": "Overview of Hackathon Rules and Guidelines",
-      "startTime": "2025-10-07T11:16:00",
-      "endTime": "2025-10-07T11:17:00",
+      "startTime": "2025-10-07T12:11:00",
+      "endTime": "2025-10-07T12:12:00",
       "type": "setup",
       "codingHours": 0,
       "description": "Overview of Hackathon Rules and Guidelines"
@@ -30,8 +30,8 @@
     {
       "id": "inauguration",
       "name": "Inauguration Ceremony",
-      "startTime": "2025-10-07T11:17:00",
-      "endTime": "2025-10-07T11:18:00",
+      "startTime": "2025-10-07T12:12:00",
+      "endTime": "2025-10-07T12:13:00",
       "type": "ceremony",
       "codingHours": 0,
       "description": "Inauguration Ceremony"
@@ -39,8 +39,8 @@
     {
       "id": "coding-slot-0",
       "name": "Coding Slot 0",
-      "startTime": "2025-10-07T11:18:00",
-      "endTime": "2025-10-07T11:19:00",
+      "startTime": "2025-10-07T12:13:00",
+      "endTime": "2025-10-07T12:14:00",
       "type": "coding",
       "codingHours": 3.5,
       "description": "First coding session"
@@ -48,8 +48,8 @@
     {
       "id": "lunch-1",
       "name": "Lunch",
-      "startTime": "2025-10-07T11:19:00",
-      "endTime": "2025-10-07T11:20:00",
+      "startTime": "2025-10-07T12:14:00",
+      "endTime": "2025-10-07T12:15:00",
       "type": "break",
       "codingHours": 0,
       "description": "Lunch Break"
@@ -57,8 +57,8 @@
     {
       "id": "coding-slot-1",
       "name": "Coding Slot 1 / Mentoring Round",
-      "startTime": "2025-10-07T11:20:00",
-      "endTime": "2025-10-07T11:21:00",
+      "startTime": "2025-10-07T12:15:00",
+      "endTime": "2025-10-07T12:16:00",
       "type": "coding",
       "codingHours": 3.5,
       "description": "Coding with mentoring support"
@@ -66,8 +66,8 @@
     {
       "id": "snack-1",
       "name": "Snack Break",
-      "startTime": "2025-10-07T11:21:00",
-      "endTime": "2025-10-07T11:22:00",
+      "startTime": "2025-10-07T12:16:00",
+      "endTime": "2025-10-07T12:17:00",
       "type": "break",
       "codingHours": 0,
       "description": "Snack Break"
@@ -75,8 +75,8 @@
     {
       "id": "coding-slot-2",
       "name": "Coding Slot 2",
-      "startTime": "2025-10-07T11:22:00",
-      "endTime": "2025-10-07T11:23:00",
+      "startTime": "2025-10-07T12:17:00",
+      "endTime": "2025-10-07T12:18:00",
       "type": "coding",
       "codingHours": 2,
       "description": "Evening coding session"
@@ -84,8 +84,8 @@
     {
       "id": "dinner-1",
       "name": "Dinner",
-      "startTime": "2025-10-07T11:23:00",
-      "endTime": "2025-10-07T11:24:00",
+      "startTime": "2025-10-07T12:18:00",
+      "endTime": "2025-10-07T12:19:00",
       "type": "break",
       "codingHours": 0,
       "description": "Dinner Break"
@@ -93,8 +93,8 @@
     {
       "id": "coding-slot-3",
       "name": "Coding Slot 3",
-      "startTime": "2025-10-07T11:24:00",
-      "endTime": "2025-10-07T11:25:00",
+      "startTime": "2025-10-07T12:19:00",
+      "endTime": "2025-10-07T12:20:00",
       "type": "coding",
       "codingHours": 9.5,
       "description": "Overnight coding marathon"
@@ -102,8 +102,8 @@
     {
       "id": "breakfast-1",
       "name": "Breakfast",
-      "startTime": "2025-10-07T11:25:00",
-      "endTime": "2025-10-07T11:26:00",
+      "startTime": "2025-10-07T12:20:00",
+      "endTime": "2025-10-07T12:21:00",
       "type": "break",
       "codingHours": 0,
       "description": "Breakfast"
@@ -111,8 +111,8 @@
     {
       "id": "judging-1",
       "name": "Judging Round 1",
-      "startTime": "2025-10-07T11:26:00",
-      "endTime": "2025-10-07T11:27:00",
+      "startTime": "2025-10-07T12:21:00",
+      "endTime": "2025-10-07T12:22:00",
       "type": "judging",
       "codingHours": 0,
       "description": "First round of judging"
@@ -120,8 +120,8 @@
     {
       "id": "coding-slot-4",
       "name": "Coding Slot 4",
-      "startTime": "2025-10-07T11:27:00",
-      "endTime": "2025-10-07T11:28:00",
+      "startTime": "2025-10-07T12:22:00",
+      "endTime": "2025-10-07T12:23:00",
       "type": "coding",
       "codingHours": 3.5,
       "description": "Post-judging coding session"
@@ -129,8 +129,8 @@
     {
       "id": "lunch-2",
       "name": "Lunch",
-      "startTime": "2025-10-07T11:28:00",
-      "endTime": "2025-10-07T11:29:00",
+      "startTime": "2025-10-07T12:23:00",
+      "endTime": "2025-10-07T12:24:00",
       "type": "break",
       "codingHours": 0,
       "description": "Lunch Break"
@@ -138,8 +138,8 @@
     {
       "id": "coding-slot-5",
       "name": "Coding Slot 5",
-      "startTime": "2025-10-07T11:29:00",
-      "endTime": "2025-10-07T11:30:00",
+      "startTime": "2025-10-07T12:24:00",
+      "endTime": "2025-10-07T12:25:00",
       "type": "coding",
       "codingHours": 3.5,
       "description": "Afternoon coding session"
@@ -147,8 +147,8 @@
     {
       "id": "snack-2",
       "name": "Snack Break",
-      "startTime": "2025-10-07T11:30:00",
-      "endTime": "2025-10-07T11:31:00",
+      "startTime": "2025-10-07T12:25:00",
+      "endTime": "2025-10-07T12:26:00",
       "type": "break",
       "codingHours": 0,
       "description": "Snack Break"
@@ -156,8 +156,8 @@
     {
       "id": "judging-2",
       "name": "Judging Round 2",
-      "startTime": "2025-10-07T11:31:00",
-      "endTime": "2025-10-07T11:32:00",
+      "startTime": "2025-10-07T12:26:00",
+      "endTime": "2025-10-07T12:27:00",
       "type": "judging",
       "codingHours": 0,
       "description": "Second round of judging"
@@ -165,8 +165,8 @@
     {
       "id": "dinner-2",
       "name": "Dinner",
-      "startTime": "2025-10-07T11:32:00",
-      "endTime": "2025-10-07T11:33:00",
+      "startTime": "2025-10-07T12:27:00",
+      "endTime": "2025-10-07T12:28:00",
       "type": "break",
       "codingHours": 0,
       "description": "Dinner Break"
@@ -174,8 +174,8 @@
     {
       "id": "coding-slot-6",
       "name": "Coding Slot 6",
-      "startTime": "2025-10-07T11:33:00",
-      "endTime": "2025-10-07T11:34:00",
+      "startTime": "2025-10-07T12:28:00",
+      "endTime": "2025-10-07T12:29:00",
       "type": "coding",
       "codingHours": 2.5,
       "description": "Evening coding session"
@@ -183,8 +183,8 @@
     {
       "id": "bug-bounty",
       "name": "Bug Bounty Round",
-      "startTime": "2025-10-07T11:34:00",
-      "endTime": "2025-10-07T11:35:00",
+      "startTime": "2025-10-07T12:29:00",
+      "endTime": "2025-10-07T12:30:00",
       "type": "special",
       "codingHours": 2,
       "description": "Bug hunting and fixing competition"
@@ -192,8 +192,8 @@
     {
       "id": "coding-slot-7",
       "name": "Coding Slot 7 (Bug Fixing Round)",
-      "startTime": "2025-10-07T11:35:00",
-      "endTime": "2025-10-07T11:36:00",
+      "startTime": "2025-10-07T12:30:00",
+      "endTime": "2025-10-07T12:31:00",
       "type": "coding",
       "codingHours": 6,
       "description": "Final coding session with bug fixes"
@@ -201,8 +201,8 @@
     {
       "id": "breakfast-2",
       "name": "Breakfast",
-      "startTime": "2025-10-07T11:36:00",
-      "endTime": "2025-10-07T11:37:00",
+      "startTime": "2025-10-07T12:31:00",
+      "endTime": "2025-10-07T12:32:00",
       "type": "break",
       "codingHours": 0,
       "description": "Final Breakfast"
@@ -210,8 +210,8 @@
     {
       "id": "judging-3",
       "name": "Judge Round 3 & Bug Bounty Evaluation",
-      "startTime": "2025-10-07T11:37:00",
-      "endTime": "2025-10-07T11:38:00",
+      "startTime": "2025-10-07T12:32:00",
+      "endTime": "2025-10-07T12:33:00",
       "type": "judging",
       "codingHours": 0,
       "description": "Final judging and bug bounty evaluation"
@@ -219,8 +219,8 @@
     {
       "id": "judge-deliberation",
       "name": "Judges Discussion & Evaluation for Shortlisting Top Teams",
-      "startTime": "2025-10-07T11:38:00",
-      "endTime": "2025-10-07T11:39:00",
+      "startTime": "2025-10-07T12:33:00",
+      "endTime": "2025-10-07T12:34:00",
       "type": "judging",
       "codingHours": 0,
       "description": "Judges deliberation for top teams"
@@ -228,8 +228,8 @@
     {
       "id": "final-presentation",
       "name": "Final Presentation (Top Teams)",
-      "startTime": "2025-10-07T11:39:00",
-      "endTime": "2025-10-07T11:40:00",
+      "startTime": "2025-10-07T12:34:00",
+      "endTime": "2025-10-07T12:35:00",
       "type": "presentation",
       "codingHours": 0,
       "description": "Final presentations by top teams"
@@ -237,8 +237,8 @@
     {
       "id": "lunch-3",
       "name": "Lunch",
-      "startTime": "2025-10-07T11:40:00",
-      "endTime": "2025-10-07T11:41:00",
+      "startTime": "2025-10-07T12:35:00",
+      "endTime": "2025-10-07T12:36:00",
       "type": "break",
       "codingHours": 0,
       "description": "Final Lunch"
@@ -246,8 +246,8 @@
     {
       "id": "judge-deliberation-final",
       "name": "Judge Deliberation",
-      "startTime": "2025-10-07T11:41:00",
-      "endTime": "2025-10-07T11:42:00",
+      "startTime": "2025-10-07T12:36:00",
+      "endTime": "2025-10-07T12:37:00",
       "type": "judging",
       "codingHours": 0,
       "description": "Final judge deliberation"
@@ -255,8 +255,8 @@
     {
       "id": "valedictory",
       "name": "Valedictory Ceremony",
-      "startTime": "2025-10-07T11:42:00",
-      "endTime": "2025-10-07T11:43:00",
+      "startTime": "2025-10-07T12:37:00",
+      "endTime": "2025-10-07T12:38:00",
       "type": "ceremony",
       "codingHours": 0,
       "description": "Awards and closing ceremony"

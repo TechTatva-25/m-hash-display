@@ -65,15 +65,27 @@
 
         .logo-section {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 1rem;
             width: 100%;
         }
 
+        .title-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 5rem;
+            border-radius: 20px;
+            padding: 2rem 3rem;
+        }
+
+        .title-content {
+            text-align: center;
+        }
+
         .logo {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -81,18 +93,21 @@
             border-radius: 12px;
             overflow: hidden;
             padding: 12px;
+            flex-shrink: 0;
         }
 
         .logo img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-        }
-
-        .logo img {
             position: relative;
             z-index: 1;
         }
+
+        .title-container .logo:first-child {
+            background: white;
+        }
+
 
         .hackathon-title {
             font-size: 4.5rem;
@@ -116,6 +131,39 @@
             font-size: 1.2rem;
             font-weight: 500;
             color: #c8e8c8;
+        }
+
+        .audio-status {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 216, 168, 0.3);
+            z-index: 1000;
+        }
+
+        .audio-indicator {
+            font-size: 1.2rem;
+        }
+
+        .audio-text {
+            font-size: 0.9rem;
+            color: #a8d8a8;
+        }
+
+        .audio-status.unlocked .audio-indicator {
+            color: #4CAF50;
+        }
+
+        .audio-status.unlocked .audio-text {
+            color: #4CAF50;
         }
 
         /* Main content */
@@ -375,16 +423,18 @@
     <div class="container">
         <header class="header">
             <div class="logo-section">
-                <div class="logo">
-                    <img src="public/manipal-logo.png" alt="Manipal Institute of Technology" />
-                </div>
-                <div>
-                    <h1 class="hackathon-title">Manipal Hackathon 2025</h1>
-                    <p class="hackathon-subtitle">Code for Coexistence</p>
-                    <p class="institute-name">Manipal Institute of Technology</p>
-                </div>
-                <div class="logo">
-                    <img src="public/mhash-logo.png" alt="Manipal Hackathon" />
+                <div class="title-container">
+                    <div class="logo">
+                        <img src="public/manipal-logo.png" alt="Manipal Institute of Technology" />
+                    </div>
+                    <div class="title-content">
+                        <h1 class="hackathon-title">Manipal Hackathon 2025</h1>
+                        <p class="hackathon-subtitle">Code for Coexistence</p>
+                        <p class="institute-name">Manipal Institute of Technology</p>
+                    </div>
+                    <div class="logo">
+                        <img src="public/mhash-logo.png" alt="Manipal Hackathon" />
+                    </div>
                 </div>
             </div>
         </header>
@@ -435,6 +485,11 @@
                 <div class="next-round-time" id="nextRoundTime">--:--</div>
             </div>
         </main>
+        
+        <div class="audio-status" id="audioStatus">
+            <span class="audio-indicator" id="audioIndicator">🔇</span>
+            <span class="audio-text" id="audioText">Click anywhere to enable audio</span>
+        </div>
     </div>
 
     <script src="script.js"></script>
