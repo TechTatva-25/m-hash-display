@@ -8,10 +8,12 @@ class HackathonStatusDisplay {
         this.isAudioEnabled = true;
         this.isPlayingAudio = false;
         this.lastAnnouncedRound = null;
-        this.audioUnlocked = false; // Track if user has interacted with the page
+        this.audioUnlocked = true; // Always unlocked for TTS
         this.hasTriggeredStartAudio = {}; // Track which rounds have triggered start audio
         this.hasTriggeredEndAudio = {}; // Track which rounds have triggered end audio
         this.audioQueue = []; // Queue for audio playback
+        this.selectedVoice = null; // Store selected voice
+        this.voices = []; // Available voices
         
         this.init();
     }
@@ -226,20 +228,26 @@ class HackathonStatusDisplay {
             const startTime = new Date(round.startTime);
             const endTime = new Date(round.endTime);
             
-            // Check if a round is about to start (10 seconds before start)
-            if (now >= new Date(startTime.getTime() - 10000) && now <= new Date(startTime.getTime() + 5000)) {
-                // Only trigger once per round
+            // Check if a round is starting (trigger 5 seconds before start until 5 seconds after)
+            const startTriggerTime = startTime.getTime() - 5000;  // 5 seconds before
+            const startEndTime = startTime.getTime() + 5000;     // 5 seconds after
+            
+            if (now >= new Date(startTriggerTime) && now <= new Date(startEndTime)) {
                 if (!this.hasTriggeredStartAudio[round.id]) {
                     this.hasTriggeredStartAudio[round.id] = true;
+                    console.log(`🔔 Round starting soon: ${round.name}`);
                     this.queueRoundStartAudio(round, 1000); // 1 second delay
                 }
             }
             
-            // Check if a round is about to end (10 seconds before end)
-            if (now >= new Date(endTime.getTime() - 10000) && now <= new Date(endTime.getTime() + 5000)) {
-                // Only trigger once per round
+            // Check if a round is ending (trigger 10 seconds before end until end time)
+            const endTriggerTime = endTime.getTime() - 10000;    // 10 seconds before
+            const endEndTime = endTime.getTime();                // At end time
+            
+            if (now >= new Date(endTriggerTime) && now <= new Date(endEndTime)) {
                 if (!this.hasTriggeredEndAudio[round.id]) {
                     this.hasTriggeredEndAudio[round.id] = true;
+                    console.log(`⏰ Round ending soon: ${round.name}`);
                     this.playRoundEndAudio(round);
                 }
             }
@@ -247,56 +255,167 @@ class HackathonStatusDisplay {
     }
 
     setupAudio() {
-        // Initialize audio system
+        // Initialize TTS system
         this.isAudioEnabled = true;
-        this.audioUnlocked = false; // Track if user has interacted
-        console.log('Audio system initialized (requires user interaction)');
+        this.audioUnlocked = true; // TTS doesn't need user interaction
+        console.log('🎙️ Text-to-Speech system initialized');
         
-        // Initialize Web Audio API
-        try {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            console.log('Web Audio API available:', this.audioContext.state);
-        } catch (error) {
-            console.log('Web Audio API not available');
+        // Load available voices
+        this.loadVoices();
+        
+        // Listen for voices changed event
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                this.loadVoices();
+            };
         }
         
-        // Add user interaction handlers to unlock audio
-        const unlockAudio = () => {
-            if (!this.audioUnlocked) {
-                console.log('🔓 Unlocking audio with user interaction...');
-                this.audioUnlocked = true;
-                
-                // Update UI
-                this.updateAudioStatus();
-                
-                // Resume audio context if suspended
-                if (this.audioContext && this.audioContext.state === 'suspended') {
-                    this.audioContext.resume().then(() => {
-                        console.log('✅ Audio context resumed');
-                    });
-                }
-                
-                // Test audio playback
-                this.testAudioPlayback();
-            }
-        };
+        // Update UI
+        this.updateAudioStatus();
         
-        // Unlock audio on first user interaction
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('keydown', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+        // Test TTS
+        this.testTTSPlayback();
     }
     
-    async testAudioPlayback() {
-        console.log('🧪 Testing audio playback...');
+    loadVoices() {
+        this.voices = speechSynthesis.getVoices();
+        console.log('🎤 Available voices:', this.voices.length);
+        
+        // Populate voice selector
+        this.populateVoiceSelector();
+        
+        // Try to select a good female voice first
+        const preferredVoices = [
+            'Google US English Female',
+            'Microsoft Zira - English (United States)',
+            'Samantha',
+            'Karen',
+            'Moira',
+            'Tessa',
+            'Google UK English Female'
+        ];
+        
+        // Look for preferred voices
+        for (const voiceName of preferredVoices) {
+            const voice = this.voices.find(v => v.name.includes(voiceName) || v.name === voiceName);
+            if (voice) {
+                this.selectedVoice = voice;
+                console.log('✅ Selected preferred voice:', voice.name);
+                break;
+            }
+        }
+        
+        // If no preferred voice found, select first female voice
+        if (!this.selectedVoice) {
+            const femaleVoice = this.voices.find(v => 
+                v.name.toLowerCase().includes('female') || 
+                v.name.toLowerCase().includes('woman') ||
+                v.name.includes('Zira') ||
+                v.name.includes('Hazel') ||
+                v.name.includes('Karen') ||
+                v.name.includes('Susan') ||
+                v.name.includes('Victoria')
+            );
+            
+            if (femaleVoice) {
+                this.selectedVoice = femaleVoice;
+                console.log('✅ Selected female voice:', femaleVoice.name);
+            } else {
+                // Fallback to first available voice
+                this.selectedVoice = this.voices[0] || null;
+                console.log('✅ Selected fallback voice:', this.selectedVoice?.name || 'Default');
+            }
+        }
+        
+        // Update voice selector to show selected voice
+        this.updateVoiceSelector();
+    }
+
+    populateVoiceSelector() {
+        const voiceSelector = document.getElementById('voiceSelector');
+        if (!voiceSelector) return;
+        
+        // Clear existing options
+        voiceSelector.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'System Default';
+        voiceSelector.appendChild(defaultOption);
+        
+        // Group voices by language and gender
+        const englishVoices = this.voices.filter(voice => 
+            voice.lang.startsWith('en') && voice.name
+        );
+        
+        // Sort voices: female voices first, then male, then others
+        englishVoices.sort((a, b) => {
+            const aIsFemale = this.isLikelyFemaleVoice(a);
+            const bIsFemale = this.isLikelyFemaleVoice(b);
+            
+            if (aIsFemale && !bIsFemale) return -1;
+            if (!aIsFemale && bIsFemale) return 1;
+            return a.name.localeCompare(b.name);
+        });
+        
+        // Add voice options
+        englishVoices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.name;
+            const gender = this.isLikelyFemaleVoice(voice) ? '♀️' : '♂️';
+            option.textContent = `${gender} ${voice.name}`;
+            voiceSelector.appendChild(option);
+        });
+        
+        // Add event listener for voice change
+        voiceSelector.addEventListener('change', (e) => {
+            this.changeVoice(e.target.value);
+        });
+    }
+
+    isLikelyFemaleVoice(voice) {
+        const femaleIndicators = [
+            'female', 'woman', 'zira', 'hazel', 'karen', 'susan', 'victoria', 
+            'samantha', 'tessa', 'moira', 'alex', 'allison', 'ava', 'serena'
+        ];
+        return femaleIndicators.some(indicator => 
+            voice.name.toLowerCase().includes(indicator)
+        );
+    }
+
+    updateVoiceSelector() {
+        const voiceSelector = document.getElementById('voiceSelector');
+        if (!voiceSelector || !this.selectedVoice) return;
+        
+        voiceSelector.value = this.selectedVoice.name;
+    }
+
+    changeVoice(voiceName) {
+        if (!voiceName) {
+            this.selectedVoice = null;
+            console.log('🎤 Changed to system default voice');
+        } else {
+            const voice = this.voices.find(v => v.name === voiceName);
+            if (voice) {
+                this.selectedVoice = voice;
+                console.log('🎤 Changed voice to:', voice.name);
+                
+                // Test the new voice
+                this.speakText('Voice changed successfully!', 0.5);
+            }
+        }
+        
+        this.updateAudioStatus();
+    }
+
+    async testTTSPlayback() {
+        console.log('🧪 Testing TTS playback...');
         try {
-            const audio = new Audio('audio/round-start.wav');
-            audio.volume = 0.1; // Very quiet test
-            await audio.play();
-            console.log('✅ Audio playback test successful');
-            audio.pause();
+            this.speakText('Text to speech system ready!', 0.3); // Quiet test
+            console.log('✅ TTS test successful');
         } catch (error) {
-            console.log('❌ Audio playback test failed:', error.message);
+            console.log('❌ TTS test failed:', error.message);
         }
     }
     
@@ -305,29 +424,22 @@ class HackathonStatusDisplay {
         const text = document.getElementById('audioText');
         const status = document.getElementById('audioStatus');
         
-        if (this.audioUnlocked) {
-            indicator.textContent = '🔊';
-            text.textContent = 'Audio enabled';
+        if (this.isAudioEnabled) {
+            indicator.textContent = '🎙️';
+            text.textContent = `TTS Voice: ${this.selectedVoice?.name || 'Default'}`;
             status.classList.add('unlocked');
         } else {
             indicator.textContent = '🔇';
-            text.textContent = 'Click anywhere to enable audio';
+            text.textContent = 'Audio disabled';
             status.classList.remove('unlocked');
         }
     }
 
     async playRoundStartAudio(round) {
-        console.log('🎵 Attempting to play round start audio for:', round.name);
-        console.log('Audio enabled:', this.isAudioEnabled, 'Audio unlocked:', this.audioUnlocked, 'Playing audio:', this.isPlayingAudio);
+        console.log('🎵 Playing TTS for round start:', round.name);
         
         if (!this.isAudioEnabled) {
             console.log('❌ Audio disabled');
-            return;
-        }
-        
-        if (!this.audioUnlocked) {
-            console.log('❌ Audio not unlocked yet, using text-to-speech fallback');
-            this.speakText(`${round.name} is starting now!`);
             return;
         }
         
@@ -348,17 +460,10 @@ class HackathonStatusDisplay {
     }
 
     async playRoundEndAudio(round) {
-        console.log('🎵 Attempting to play round end audio for:', round.name);
-        console.log('Audio enabled:', this.isAudioEnabled, 'Audio unlocked:', this.audioUnlocked, 'Playing audio:', this.isPlayingAudio);
+        console.log('🎵 Playing TTS for round end:', round.name);
         
         if (!this.isAudioEnabled) {
             console.log('❌ Audio disabled');
-            return;
-        }
-        
-        if (!this.audioUnlocked) {
-            console.log('❌ Audio not unlocked yet, using text-to-speech fallback');
-            this.speakText(`${round.name} is over!`);
             return;
         }
         
@@ -433,13 +538,44 @@ class HackathonStatusDisplay {
         });
     }
 
-    speakText(text) {
+    speakText(text, volume = 0.9) {
         if ('speechSynthesis' in window) {
+            console.log('🗣️ Speaking:', text);
+            
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.8;
-            utterance.pitch = 1.2;
-            utterance.volume = 0.8;
+            
+            // Use selected voice if available
+            if (this.selectedVoice) {
+                utterance.voice = this.selectedVoice;
+            }
+            
+            // Enhanced voice settings for better quality
+            utterance.rate = 0.85;        // Slightly slower for clarity
+            utterance.pitch = 1.1;       // Slightly higher pitch for pleasantness
+            utterance.volume = volume;    // Adjustable volume
+            
+            // Add events for debugging
+            utterance.onstart = () => {
+                console.log('🎤 TTS started:', text);
+                this.isPlayingAudio = true;
+            };
+            
+            utterance.onend = () => {
+                console.log('✅ TTS completed:', text);
+                this.isPlayingAudio = false;
+            };
+            
+            utterance.onerror = (error) => {
+                console.log('❌ TTS error:', error);
+                this.isPlayingAudio = false;
+            };
+            
             speechSynthesis.speak(utterance);
+        } else {
+            console.log('❌ Speech synthesis not supported');
         }
     }
 
@@ -589,41 +725,146 @@ class HackathonStatusDisplay {
         console.log('🔄 Audio queue processing completed');
     }
 
-    // Play end audio sequence
+    // Play end audio sequence using TTS
     async playEndAudioSequence(round) {
-        console.log('🔊 Playing end audio sequence for:', round.name);
+        console.log('🔊 Playing TTS end sequence for:', round.name);
         
-        // Play generic end audio
-        console.log('🔊 Playing generic end audio:', this.config.audio?.roundEnd);
-        const endDuration = await this.playAudioFileWithDuration(`audio/${this.config.audio?.roundEnd}`);
-        console.log('✅ Round end audio completed, duration:', endDuration);
+        // Create ending message
+        const endMessage = this.createEndMessage(round);
+        await this.speakTextAsync(endMessage);
         
-        // Add extra delay after end audio
-        console.log('⏳ Waiting 2 seconds after end audio...');
-        await this.delay(2000);
+        // Add short delay after end audio
+        console.log('⏳ Waiting 1 second after end announcement...');
+        await this.delay(1000);
     }
 
-    // Play start audio sequence
+    // Play start audio sequence using TTS
     async playStartAudioSequence(round) {
-        console.log('🔊 Playing start audio sequence for:', round.name);
+        console.log('🔊 Playing TTS start sequence for:', round.name);
         
-        // Play specific round audio first
-        const roundAudioFile = this.config.audio?.rounds?.[round.id];
-        if (roundAudioFile) {
-            console.log('🔊 Playing round-specific audio:', roundAudioFile);
-            const roundDuration = await this.playAudioFileWithDuration(`audio/${roundAudioFile}`);
-            console.log('✅ Round-specific audio completed, duration:', roundDuration);
-            
-            // Dynamic delay based on audio length (minimum 500ms, maximum 2 seconds)
-            const dynamicDelay = Math.min(Math.max(roundDuration * 0.2, 500), 2000);
-            console.log(`⏳ Waiting ${dynamicDelay}ms between audio files...`);
-            await this.delay(dynamicDelay);
-        }
+        // Create start message
+        const startMessage = this.createStartMessage(round);
+        await this.speakTextAsync(startMessage);
         
-        // Then play generic start audio
-        console.log('🔊 Playing generic start audio:', this.config.audio?.roundStart);
-        const startDuration = await this.playAudioFileWithDuration(`audio/${this.config.audio?.roundStart}`);
-        console.log('✅ Round start audio completed, duration:', startDuration);
+        // Add short delay after start audio
+        console.log('⏳ Waiting 1 second after start announcement...');
+        await this.delay(1000);
+    }
+
+    // Create personalized start messages
+    createStartMessage(round) {
+        const messages = {
+            'registration': 'Welcome to Manipal Hackathon 2025! Registration and welcome address is now starting. Please gather at the main venue.',
+            'rules': 'Attention participants! The hackathon rules and guidelines session is beginning. Please pay close attention to the important information.',
+            'inauguration': 'The inauguration ceremony is now commencing. Let the coding adventure begin!',
+            'coding-slot-0': 'Attention hackers! Coding session is now starting. Get your keyboards ready and let\'s build something amazing!',
+            'coding-slot-1': 'Coding session with mentoring support is beginning. Mentors are available to help you with your projects.',
+            'coding-slot-2': 'Evening coding session is starting. Keep up the great work, hackers!',
+            'coding-slot-3': 'The overnight coding marathon begins now! This is your chance to make significant progress. Stay energized!',
+            'coding-slot-4': 'Post-judging coding session is starting. Time to implement the feedback from judges.',
+            'coding-slot-5': 'Afternoon coding session is beginning. You\'re doing great, keep pushing forward!',
+            'coding-slot-6': 'Final evening coding session is starting. The finish line is approaching!',
+            'coding-slot-7': 'Final coding session with bug fixing is beginning. Polish your projects to perfection!',
+            'lunch-1': 'Lunch break is starting! Time to refuel and recharge for more coding.',
+            'lunch-2': 'Lunch time again! Enjoy your meal and network with fellow participants.',
+            'lunch-3': 'Final lunch break is starting. Almost there, participants!',
+            'dinner-1': 'Dinner break is beginning. Enjoy your meal and prepare for the evening sessions.',
+            'dinner-2': 'Dinner time! Take this opportunity to relax and strategize.',
+            'breakfast-1': 'Good morning, hackers! Breakfast is served. Fuel up for an exciting day ahead.',
+            'breakfast-2': 'Final breakfast is starting. The last stretch of the hackathon begins!',
+            'snack-1': 'Snack break is starting. Grab some refreshments and keep the energy high!',
+            'snack-2': 'Another snack break begins. You\'re doing amazing, participants!',
+            'judging-1': 'First judging round is starting. Present your progress confidently to the judges.',
+            'judging-2': 'Second judging round begins. Show off your improvements and innovations.',
+            'judging-3': 'Final judging round is starting. This is your moment to shine!',
+            'bug-bounty': 'Bug bounty round is beginning! Time to hunt and fix those bugs. Good luck, hunters!',
+            'judge-deliberation': 'Judges are now deliberating to shortlist the top teams. Great work, everyone!',
+            'judge-deliberation-final': 'Final judge deliberation is beginning. The winners will be announced soon!',
+            'final-presentation': 'Final presentations by top teams are starting. Best of luck to our finalists!',
+            'valedictory': 'The valedictory ceremony begins now. Thank you all for an amazing hackathon!'
+        };
+        
+        return messages[round.id] || `${round.name} is starting now. Good luck, participants!`;
+    }
+
+    // Create personalized end messages
+    createEndMessage(round) {
+        const messages = {
+            'registration': 'Registration and welcome address has concluded. Get ready for the rules briefing!',
+            'rules': 'Rules session is over. Now you know what it takes to win. Good luck!',
+            'inauguration': 'Inauguration ceremony has ended. Let the coding begin!',
+            'coding-slot-0': 'First coding session is complete. Great start, everyone!',
+            'coding-slot-1': 'Coding session with mentoring has ended. Time for a well-deserved break!',
+            'coding-slot-2': 'Evening coding session is complete. Excellent progress, hackers!',
+            'coding-slot-3': 'The overnight coding marathon has ended. You survived the night! Amazing dedication!',
+            'coding-slot-4': 'Post-judging coding session is over. Your implementations look fantastic!',
+            'coding-slot-5': 'Afternoon coding session is complete. You\'re in the final stretch!',
+            'coding-slot-6': 'Evening coding session has ended. Almost at the finish line!',
+            'coding-slot-7': 'Final coding session is complete. Congratulations on completing the hackathon coding phase!',
+            'lunch-1': 'Lunch break is over. Ready for more coding? Let\'s go!',
+            'lunch-2': 'Lunch time has ended. Back to building amazing projects!',
+            'lunch-3': 'Final lunch break is over. Time for the last phase of the hackathon!',
+            'dinner-1': 'Dinner break has ended. Ready for the evening coding session?',
+            'dinner-2': 'Dinner is over. Let\'s continue building something great!',
+            'breakfast-1': 'Breakfast is over. Time to code with renewed energy!',
+            'breakfast-2': 'Final breakfast has ended. Let\'s make the most of the remaining time!',
+            'snack-1': 'Snack break is over. Back to coding with fresh energy!',
+            'snack-2': 'Snack time has ended. Keep up the excellent work!',
+            'judging-1': 'First judging round is complete. Incorporate the feedback and keep improving!',
+            'judging-2': 'Second judging round has ended. You\'re getting closer to the finish line!',
+            'judging-3': 'Final judging round is complete. You\'ve done an amazing job!',
+            'bug-bounty': 'Bug bounty round is over. Hope you caught some good bugs!',
+            'judge-deliberation': 'Judge deliberation is complete. The top teams have been selected!',
+            'judge-deliberation-final': 'Final judge deliberation has ended. Results will be announced shortly!',
+            'final-presentation': 'Final presentations are complete. Outstanding work from all teams!',
+            'valedictory': 'The valedictory ceremony has concluded. Thank you for an incredible hackathon!'
+        };
+        
+        return messages[round.id] || `${round.name} has ended. Well done, participants!`;
+    }
+
+    // Promise-based speak text method
+    speakTextAsync(text, volume = 0.9) {
+        return new Promise((resolve) => {
+            if ('speechSynthesis' in window) {
+                console.log('�️ Speaking async:', text);
+                
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Use selected voice if available
+                if (this.selectedVoice) {
+                    utterance.voice = this.selectedVoice;
+                }
+                
+                utterance.rate = 0.85;
+                utterance.pitch = 1.1;
+                utterance.volume = volume;
+                
+                utterance.onend = () => {
+                    console.log('✅ TTS completed async:', text);
+                    this.isPlayingAudio = false;
+                    resolve();
+                };
+                
+                utterance.onerror = (error) => {
+                    console.log('❌ TTS error async:', error);
+                    this.isPlayingAudio = false;
+                    resolve(); // Resolve anyway to continue
+                };
+                
+                utterance.onstart = () => {
+                    this.isPlayingAudio = true;
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                console.log('❌ Speech synthesis not supported');
+                resolve();
+            }
+        });
     }
 }
 
@@ -642,6 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.hackathonDisplay) {
                 const rounds = window.hackathonDisplay.config?.rounds || [];
                 if (rounds.length > 0) {
+                    console.log('🧪 Testing round START audio...');
                     window.hackathonDisplay.triggerRoundTransition(rounds[0].id, 'start');
                 }
             }
@@ -652,28 +894,61 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.hackathonDisplay) {
                 const rounds = window.hackathonDisplay.config?.rounds || [];
                 if (rounds.length > 0) {
+                    console.log('🧪 Testing round END audio...');
                     window.hackathonDisplay.triggerRoundTransition(rounds[0].id, 'end');
                 }
+            }
+        }
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            // Test TTS system
+            if (window.hackathonDisplay) {
+                console.log('🧪 Testing TTS system...');
+                window.hackathonDisplay.speakText('This is a test of the text to speech system. The voice sounds great!');
+            }
+        }
+        if (e.ctrlKey && e.key === 'v') {
+            e.preventDefault();
+            // List available voices
+            if (window.hackathonDisplay) {
+                console.log('🎤 Available voices:', window.hackathonDisplay.voices.length);
+                window.hackathonDisplay.voices.forEach((voice, index) => {
+                    const gender = window.hackathonDisplay.isLikelyFemaleVoice(voice) ? '♀️' : '♂️';
+                    console.log(`${index + 1}. ${gender} ${voice.name} (${voice.lang})`);
+                });
             }
         }
         if (e.ctrlKey && e.key === 'r') {
             e.preventDefault();
             // Reset audio state
             if (window.hackathonDisplay) {
+                console.log('🔄 Resetting audio state...');
                 window.hackathonDisplay.resetAudioState();
             }
         }
-        if (e.ctrlKey && e.key === 'u') {
+        if (e.ctrlKey && e.key === 'n') {
             e.preventDefault();
-            // Force unlock audio
+            // Simulate upcoming round transition
             if (window.hackathonDisplay) {
-                window.hackathonDisplay.forceUnlockAudio();
+                console.log('🧪 Simulating round transition in 3 seconds...');
+                setTimeout(() => {
+                    const rounds = window.hackathonDisplay.config?.rounds || [];
+                    if (rounds.length > 1) {
+                        window.hackathonDisplay.triggerRoundTransition(rounds[1].id, 'start');
+                    }
+                }, 3000);
             }
         }
     });
     
-    console.log('Hackathon Status Display initialized');
-    console.log('Press Ctrl+S to test round start audio, Ctrl+E to test round end audio, Ctrl+R to reset audio state, Ctrl+U to force unlock audio');
+    console.log('🎉 Hackathon Status Display initialized with TTS system');
+    console.log('🎮 Keyboard Shortcuts:');
+    console.log('  Ctrl+S: Test round START audio');
+    console.log('  Ctrl+E: Test round END audio'); 
+    console.log('  Ctrl+T: Test TTS system');
+    console.log('  Ctrl+V: List available voices');
+    console.log('  Ctrl+N: Simulate upcoming round transition');
+    console.log('  Ctrl+R: Reset audio state');
 });
 
 // Handle page visibility changes to pause/resume audio

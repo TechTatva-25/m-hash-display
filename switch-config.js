@@ -18,7 +18,7 @@ const mode = process.argv[2];
 if (!mode || !['test', 'prod'].includes(mode)) {
     console.log('❌ Usage: node switch-config.js [test|prod]');
     console.log('');
-    console.log('  test  - Switch to test mode (1-minute intervals starting at 12:10 PM today)');
+    console.log('  test  - Switch to test mode (1-minute intervals starting at 1:50 AM today)');
     console.log('  prod  - Switch to production mode (real hackathon timeline)');
     process.exit(1);
 }
@@ -28,13 +28,15 @@ try {
         // Switch to test config (never overwrites production backup)
         if (fs.existsSync('hackathon-config-test.json')) {
             fs.copyFileSync('hackathon-config-test.json', 'hackathon-config.json');
-            console.log('🧪 Switched to TEST mode');
-            console.log('   - All events start at 12:10 PM today');
+            console.log('🧪 Switched to TEST mode with TTS Audio');
+            console.log('   - All events start at 1:50 AM today (Oct 8, 2025)');
             console.log('   - Each event lasts 1 minute');
-            console.log('   - Perfect for demo and testing');
+            console.log('   - Text-to-Speech announcements enabled');
+            console.log('   - Perfect for demo and testing audio transitions');
             console.log('');
             console.log('🚀 Run "npm start" to see the test display');
-            console.log('⏰ Events will transition every minute starting at 12:10 PM');
+            console.log('⏰ Events will transition every minute starting at 1:50 AM');
+            console.log('🎙️ Listen for TTS announcements at round transitions');
             console.log('⚠️  Production config is safely preserved in backup');
         } else {
             console.log('❌ Test configuration file not found: hackathon-config-test.json');

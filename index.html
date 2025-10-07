@@ -59,7 +59,7 @@
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 0.5rem;
             animation: slideDown 1s ease-out;
         }
 
@@ -74,7 +74,7 @@
         .title-container {
             display: flex;
             align-items: flex-start;
-            gap: 5rem;
+            gap: 3rem;
             border-radius: 20px;
             padding: 2rem 3rem;
         }
@@ -104,8 +104,46 @@
             z-index: 1;
         }
 
-        .title-container .logo:first-child {
+        .title-container .logo.white-bg {
             background: white;
+        }
+
+        /* Sponsors Section */
+        .sponsors-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: slideUp 1s ease-out 0.3s both;
+        }
+
+        .sponsors-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .sponsor-logo {
+            width: 600px;
+            height: 130px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sponsor-logo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .sponsor-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
 
@@ -164,6 +202,28 @@
 
         .audio-status.unlocked .audio-text {
             color: #4CAF50;
+        }
+
+        .voice-selector {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(168, 216, 168, 0.3);
+            border-radius: 8px;
+            color: #a8d8a8;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            min-width: 150px;
+            cursor: pointer;
+        }
+
+        .voice-selector:focus {
+            outline: 2px solid #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .voice-selector option {
+            background: #0d4f3c;
+            color: #e8f5e8;
         }
 
         /* Main content */
@@ -376,7 +436,10 @@
             .hackathon-title { font-size: 3.5rem; }
             .round-name { font-size: 3rem; }
             .timer-value { font-size: 3rem; }
-            .logo { width: 100px; height: 100px; padding: 10px; }
+            .logo { width: 80px; height: 80px; padding: 8px; }
+            .title-container { gap: 2rem; }
+            .sponsor-logo { width: 170px; height: 110px; }
+            .sponsors-logos { gap: 3rem; }
         }
 
         @media (max-width: 768px) {
@@ -386,8 +449,28 @@
             .timer-value { font-size: 2.5rem; }
             .round-timer { gap: 1rem; }
             .round-times { gap: 1.5rem; }
-            .logo { width: 80px; height: 80px; padding: 8px; }
+            .logo { width: 70px; height: 70px; padding: 6px; }
             .current-round { padding: 2rem; min-height: 300px; }
+            .title-container { gap: 1.5rem; }
+            .sponsor-logo { width: 140px; height: 90px; }
+            .sponsors-logos { gap: 2rem; }
+
+        }
+
+        @media (max-width: 480px) {
+            .title-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 1rem;
+            }
+            .logo { width: 60px; height: 60px; padding: 4px; }
+            .hackathon-title { font-size: 2.5rem; }
+            .sponsors-logos {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .sponsor-logo { width: 160px; height: 100px; }
         }
 
         /* Status indicators */
@@ -424,7 +507,7 @@
         <header class="header">
             <div class="logo-section">
                 <div class="title-container">
-                    <div class="logo">
+                    <div class="logo white-bg">
                         <img src="public/manipal-logo.png" alt="Manipal Institute of Technology" />
                     </div>
                     <div class="title-content">
@@ -432,12 +515,24 @@
                         <p class="hackathon-subtitle">Code for Coexistence</p>
                         <p class="institute-name">Manipal Institute of Technology</p>
                     </div>
-                    <div class="logo">
+                    <div class="logo white-bg">
                         <img src="public/mhash-logo.png" alt="Manipal Hackathon" />
                     </div>
                 </div>
             </div>
         </header>
+
+        <!-- Sponsors Section -->
+        <section class="sponsors-section">
+            <div class="sponsors-logos">
+                <div class="sponsor-logo">
+                    <img src="public/cognecto.png" alt="Cognecto" />
+                </div>
+                <div class="sponsor-logo">
+                    <img src="public/NKI Logo.png" alt="Nippon Koei India" />
+                </div>
+            </div>
+        </section>
 
         <main class="main-content">
             <div class="current-round" id="currentRound">
@@ -489,6 +584,9 @@
         <div class="audio-status" id="audioStatus">
             <span class="audio-indicator" id="audioIndicator">🔇</span>
             <span class="audio-text" id="audioText">Click anywhere to enable audio</span>
+            <select class="voice-selector" id="voiceSelector" title="Select Voice">
+                <option value="">Loading voices...</option>
+            </select>
         </div>
     </div>
 
