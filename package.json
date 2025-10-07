@@ -8,6 +8,8 @@
     "dev": "npx live-server --port=3000 --no-browser",
     "http-server": "npx http-server -p 3000 -c-1",
     "regenerate-audio": "node regenerate-audio.js",
+    "test-mode": "node switch-config.js test",
+    "prod-mode": "node switch-config.js prod",
     "build": "echo 'No build process needed for static files'",
     "test": "echo 'No tests specified'"
   },
